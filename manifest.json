@@ -1,0 +1,18 @@
+{
+  "name": "DyeMill — Free Color Palette Generator",
+  "short_name": "DyeMill",
+  "description": "Forge color palettes with harmonies, contrast checker and image extraction. No signup, works offline.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

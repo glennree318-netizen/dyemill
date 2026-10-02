@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Color Palette Generator - Harmonies, Contrast Checker | DyeMill</title>
+    <meta name="description" content="Free color palette generator: harmonies, spacebar workflow, image-to-palette extraction, WCAG contrast checker, Tailwind/CSS export. No signup, client-side, works offline.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://dyemill.vercel.app/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="DyeMill">
+    <meta property="og:title" content="DyeMill - Free Color Palette Generator">
+    <meta property="og:description" content="Forge palettes with the spacebar. Export to code. Check contrast. No account.">
+    <meta property="og:url" content="https://dyemill.vercel.app/">
+    <meta property="og:image" content="https://dyemill.vercel.app/icon.svg">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="DyeMill - Free Color Palette Generator">
+    <meta name="twitter:description" content="Forge palettes with the spacebar. Export to code. Check contrast. No account.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230d1117'/><circle cx='32' cy='38' r='12' fill='%23e74c3c'/><circle cx='62' cy='30' r='12' fill='%23f1c40f'/><circle cx='70' cy='60' r='12' fill='%233498db'/><circle cx='40' cy='68' r='12' fill='%232ecc71'/></svg>">
+    <meta name="theme-color" content="#0d1117">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.svg">
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="753da090-5ac6-475f-9ab5-ca0be8eb1316"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "DyeMill",
+      "url": "https://dyemill.vercel.app/",
+      "applicationCategory": "DesignApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "featureList": "Color palette generator, color harmonies, contrast checker, image to palette extractor, Tailwind CSS export, WCAG checker"
+    }
+    </script>
+    <style>
+        :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--text:#c9d1d9;--text2:#8b949e;--accent:#58a6ff;--accent2:#79b8ff;--success:#3fb950;--warning:#d29922;--error:#f85149;--border:#30363d;--shadow:rgba(0,0,0,.3);--radius:8px;--transition:.2s ease}
+        [data-theme=light]{--bg:#fff;--bg2:#f6f8fa;--bg3:#eaeef2;--text:#1f2328;--text2:#59636e;--accent:#0969da;--accent2:#0550ae;--success:#1a7f37;--warning:#9a6700;--error:#d1242f;--border:#d1d9e0;--shadow:rgba(0,0,0,.1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+        .header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
+        .logo{margin:0;font-size:18px;font-weight:700}
+        .logo a{color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px}
+        .logo a span{color:var(--accent)}
+        .logo svg{width:22px;height:22px}
+        .header-actions{display:flex;gap:8px;align-items:center}
+        .btn{padding:8px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);color:var(--text);cursor:pointer;font-size:13px;font-weight:600;transition:all var(--transition);display:inline-flex;align-items:center;gap:7px;line-height:1.2}
+        .btn:hover{background:var(--border);border-color:var(--text2)}
+        .btn:active{transform:scale(.98)}
+        .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+        .btn svg{width:15px;height:15px;flex-shrink:0}
+        .btn-primary{background:linear-gradient(180deg,var(--accent2),var(--accent));color:#fff;border-color:transparent;box-shadow:0 2px 8px var(--shadow)}
+        .btn-primary:hover{background:linear-gradient(180deg,var(--accent),var(--accent));border-color:transparent;filter:brightness(1.08)}
+        .btn-sm{padding:6px 10px;font-size:12px;border-radius:8px}
+        .btn-sm svg{width:13px;height:13px}
+        .main{flex:1;max-width:1080px;width:100%;margin:0 auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+        .controls{display:flex;align-items:flex-end;gap:12px;padding:14px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;flex-wrap:wrap}
+        .field{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:var(--text2)}
+        .field input[type=text],.field input[type=number],.field select{padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg3);color:var(--text);font-size:13px;outline:none}
+        .field input:focus,.field select:focus{border-color:var(--accent)}
+        input[type=color]{width:64px;height:38px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg3);cursor:pointer;padding:2px}
+        .hint{font-size:12px;color:var(--text2)}
+        kbd{background:var(--bg3);border:1px solid var(--border);border-bottom-width:2px;border-radius:5px;padding:1px 6px;font-family:inherit;font-size:11px}
+        .palette{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+        .swatch{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--bg2)}
+        .swatch-color{height:150px;cursor:pointer;position:relative;transition:filter var(--transition)}
+        .swatch-color:hover{filter:brightness(1.07)}
+        .swatch-lock{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.35);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--transition)}
+        .swatch-lock:hover{background:rgba(0,0,0,.55)}
+        .swatch-lock svg{width:15px;height:15px}
+        .swatch-lock.on{background:var(--accent);border-color:transparent}
+        .swatch-body{padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+        .swatch-hex{font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:14px;font-weight:700;cursor:pointer}
+        .swatch-hex:hover{color:var(--accent)}
+        .swatch-sub{font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:11px;color:var(--text2)}
+        .panels{display:flex;gap:16px;align-items:stretch;flex-wrap:wrap}
+        .panel{flex:1;min-width:280px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px}
+        .panel h2{font-size:15px;margin-bottom:12px}
+        .contrast-out{font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:13px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-top:10px;line-height:1.8}
+        .pass{color:var(--success);font-weight:700}
+        .fail{color:var(--error);font-weight:700}
+        .contrast-demo{border-radius:var(--radius);padding:12px;margin-top:10px;font-size:14px;font-weight:600}
+        .export-out{font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-top:10px;white-space:pre;overflow:auto;max-height:180px}
+        .status-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--bg2);border-top:1px solid var(--border);font-size:12px;color:var(--text2);gap:12px;flex-wrap:wrap}
+        .status-left,.status-right{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+        .status-bar a{color:var(--text2);text-decoration:none}
+        .status-bar a:hover{color:var(--accent)}
+        .toast-container{position:fixed;top:20px;right:20px;z-index:10000;display:flex;flex-direction:column;gap:8px}
+        .toast{padding:12px 16px;border-radius:var(--radius);color:#fff;font-size:14px;animation:slideIn .3s ease;box-shadow:0 4px 12px var(--shadow);max-width:350px}
+        .toast-success{background:var(--success)}
+        .toast-error{background:var(--error)}
+        .toast-info{background:var(--accent)}
+        @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+        dialog{background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:640px;width:calc(100vw - 40px);max-height:80vh;overflow:auto}
+        dialog::backdrop{background:rgba(0,0,0,.6)}
+        .dialog-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+        .dialog-head h2{font-size:18px;display:flex;align-items:center;gap:8px}
+        .dialog-head h2 svg{width:20px;height:20px;color:var(--accent)}
+        #aboutDialog h3{font-size:15px;margin:16px 0 8px}
+        #aboutDialog p,#aboutDialog li{font-size:14px;line-height:1.7}
+        #aboutDialog ul{padding-left:20px}
+        #aboutDialog details{margin-bottom:8px;border:1px solid var(--border);border-radius:8px;padding:8px 12px}
+        #aboutDialog summary{cursor:pointer;font-weight:600;font-size:14px}
+        ::-webkit-scrollbar{width:8px;height:8px}
+        ::-webkit-scrollbar-track{background:var(--bg)}
+        ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+        .hidden{display:none!important}
+        .ic{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        @media(max-width:760px){.palette{grid-template-columns:repeat(2,1fr)}.swatch-color{height:110px}}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1 class="logo"><a href="#"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1.6"/><circle cx="14.5" cy="9" r="1.6"/><circle cx="15.5" cy="14.5" r="1.6"/><circle cx="9.5" cy="15" r="1.6"/><path d="M12 3a9 9 0 0 0 0 18c1.5 0 2-.8 2-1.7 0-.9-.8-1.3-.8-2.3 0-1 1-1.5 2-1.5H17a4.5 4.5 0 0 0 4.5-4.5C21.5 6.6 17.2 3 12 3z"/></svg>Dye<span>Mill</span></a></h1>
+        <div class="header-actions">
+            <button class="btn btn-sm" id="aboutBtn" title="About DyeMill"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>About</button>
+            <button class="btn btn-sm" id="themeToggle" title="Toggle theme"><svg class="ic" id="iconMoon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="ic hidden" id="iconSun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
+        </div>
+    </header>
+    <main class="main">
+        <div class="controls">
+            <div class="field"><label for="baseColor">Base color</label><input type="color" id="baseColor" value="#4f6df5"></div>
+            <div class="field"><label for="baseHex">Hex</label><input type="text" id="baseHex" value="#4f6df5" style="width:90px" spellcheck="false"></div>
+            <div class="field"><label for="harmony">Harmony</label><select id="harmony"><option value="analogous">Analogous</option><option value="complementary">Complementary</option><option value="triadic">Triadic</option><option value="square">Square</option><option value="split">Split-complementary</option><option value="mono">Monochromatic</option><option value="shades">Shades</option></select></div>
+            <button class="btn btn-primary" id="diceBtn"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.4"/><circle cx="15.5" cy="15.5" r="1.4"/><circle cx="15.5" cy="8.5" r="1.4"/><circle cx="8.5" cy="15.5" r="1.4"/></svg>Random</button>
+            <button class="btn" id="extractBtn"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>From image</button>
+            <input type="file" id="extractInput" accept="image/*" hidden>
+            <span class="hint">Tip: press <kbd>Space</kbd> to re-roll unlocked colors</span>
+        </div>
+        <div class="palette" id="palette"></div>
+        <div class="panels">
+            <div class="panel">
+                <h2>Export</h2>
+                <div class="field"><label for="expFormat">Format</label><select id="expFormat"><option value="css">CSS variables</option><option value="tailwind">Tailwind config</option><option value="hex">HEX list</option><option value="rgb">RGB list</option></select></div>
+                <div class="btn-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+                    <button class="btn btn-primary" id="copyExpBtn"><svg class="ic" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button>
+                    <button class="btn" id="dlPngBtn"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PNG strip</button>
+                    <button class="btn" id="dlSvgBtn"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>SVG</button>
+                </div>
+                <div class="export-out" id="exportOut"></div>
+            </div>
+            <div class="panel">
+                <h2>Contrast checker (WCAG)</h2>
+                <div class="row2" style="display:flex;gap:10px;">
+                    <div class="field" style="flex:1;"><label for="contrastA">Text</label><select id="contrastA"></select></div>
+                    <div class="field" style="flex:1;"><label for="contrastB">Background</label><select id="contrastB"></select></div>
+                </div>
+                <div class="contrast-out" id="contrastOut"></div>
+                <div class="contrast-demo" id="contrastDemo">The quick brown fox jumps over the lazy dog</div>
+            </div>
+        </div>
+    </main>
+    <footer class="status-bar">
+        <div class="status-left"><span id="statusText">Forge palettes with the spacebar</span></div>
+        <div class="status-right"><a href="https://github.com/glennree318-netizen/dyemill/issues/new?labels=bug" target="_blank" rel="noopener">Report bug</a><a href="https://github.com/glennree318-netizen/dyemill/issues/new?labels=enhancement" target="_blank" rel="noopener">Request feature</a><span>100% Client-Side</span><span>DyeMill v1.0</span></div>
+    </footer>
+    <dialog id="aboutDialog">
+        <div class="dialog-head"><h2>About DyeMill</h2><button class="btn btn-sm" id="aboutClose"><svg class="ic" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Close</button></div>
+        <p><strong>DyeMill</strong> is a free <strong>color palette generator</strong> for designers and developers. Pick a base color, choose a harmony, lock what you love and re-roll the rest with the spacebar. Check WCAG contrast, extract palettes from photos, export to CSS or Tailwind - no account, no tracking, works offline.</p>
+        <h3>Frequently asked questions</h3>
+        <details><summary>Do I need an account to save palettes?</summary><p>No. Everything lives in your browser (localStorage) - locked colors, recent palettes, no login, nothing uploaded.</p></details>
+        <details><summary>What do the contrast grades mean?</summary><p>WCAG ratios: 4.5:1+ passes AA for normal text, 3:1+ for large text, 7:1+ passes AAA. DyeMill computes them live from any two palette colors.</p></details>
+        <details><summary>How does image extraction work?</summary><p>Your photo is downscaled in-browser, pixels are bucketed by color, and the five most distinct dominant colors become your palette. The photo never leaves your device.</p></details>
+        <details><summary>Does it work offline?</summary><p>Yes. DyeMill is an installable PWA - after your first visit it keeps working without internet.</p></details>
+        <details><summary>How do I report a bug?</summary><p>Use the <strong>Report bug</strong> and <strong>Request feature</strong> links in the footer.</p></details>
+    </dialog>
+    <div class="toast-container" id="toastContainer"></div>
+    <script>
+        // === Helpers ===
+        const $ = id => document.getElementById(id);
+        const N = 5; // palette size
+        const state = {
+            base: { h: 222, s: 88, l: 62 },
+            harmony: 'analogous',
+            locks: [false, false, false, false, false],
+            palette: [] // [{h,s,l}]
+        };
+
+        function showToast(message, type = 'info') {
+            const container = $('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2500);
+        }
+
+        // === Theme (SVG sun/moon swap) ===
+        function applyTheme(next) {
+            document.documentElement.setAttribute('data-theme', next);
+            $('iconMoon').classList.toggle('hidden', next === 'light');
+            $('iconSun').classList.toggle('hidden', next !== 'light');
+            localStorage.setItem('dyemill_theme', next);
+        }
+        $('themeToggle').addEventListener('click', () => {
+            applyTheme(document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+        });
+        applyTheme(localStorage.getItem('dyemill_theme') || 'dark');
+
+        // === Analytics events (shared Umami property) ===
+        function trackEvent(name) {
+            try { if (window.umami && typeof umami.track === 'function') umami.track(name); } catch (e) {}
+        }
+
+        // === Color math (hand-rolled, zero deps) ===
+        function clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
+        function hexToRgb(hex) {
+            hex = hex.trim().replace(/^#/, '');
+            if (/^[0-9a-fA-F]{3}$/.test(hex)) hex = hex.split('').map(c => c + c).join('');
+            if (!/^[0-9a-fA-F]{6}$/.test(hex)) return null;
+            const n = parseInt(hex, 16);
+            return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+        }
+        function rgbToHex(r, g, b) {
+            return '#' + [r, g, b].map(v => clamp(Math.round(v), 0, 255).toString(16).padStart(2, '0')).join('');
+        }
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+            let h = 0, s = 0;
+            const l = (mx + mn) / 2;
+            if (mx !== mn) {
+                const d = mx - mn;
+                s = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn);
+                if (mx === r) h = ((g - b) / d + (g < b ? 6 : 0));
+                else if (mx === g) h = ((b - r) / d + 2);
+                else h = ((r - g) / d + 4);
+                h *= 60;
+            }
+            return { h: Math.round(h), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+        function hslToRgb(h, s, l) {
+            h = ((h % 360) + 360) % 360; s = clamp(s, 0, 100) / 100; l = clamp(l, 0, 100) / 100;
+            const c = (1 - Math.abs(2 * l - 1)) * s;
+            const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+            const m = l - c / 2;
+            let r = 0, g = 0, b = 0;
+            if (h < 60) { r = c; g = x; }
+            else if (h < 120) { r = x; g = c; }
+            else if (h < 180) { g = c; b = x; }
+            else if (h < 240) { g = x; b = c; }
+            else if (h < 300) { r = x; b = c; }
+            else { r = c; b = x; }
+            return { r: Math.round((r + m) * 255), g: Math.round((g + m) * 255), b: Math.round((b + m) * 255) };
+        }
+        function luminance({ r, g, b }) {
+            const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+            return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+        }
+        function contrastRatio(a, b) {
+            const l1 = luminance(a), l2 = luminance(b);
+            return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+        }
+        function randomBase() {
+            return { h: Math.floor(Math.random() * 360), s: 55 + Math.floor(Math.random() * 40), l: 40 + Math.floor(Math.random() * 25) };
+        }
+
+        // === Harmony engine: hues per harmony, expanded to N slots ===
+        function harmonyHues(harmony, h) {
+            const wrap = d => ((h + d) % 360 + 360) % 360;
+            switch (harmony) {
+                case 'complementary': return [h, wrap(180)];
+                case 'triadic': return [h, wrap(120), wrap(240)];
+                case 'square': return [h, wrap(90), wrap(180), wrap(270)];
+                case 'split': return [h, wrap(150), wrap(210)];
+                case 'analogous': return [wrap(-30), wrap(-15), h, wrap(15), wrap(30)];
+                case 'mono': return [h, h, h, h, h];
+                case 'shades': return [h, h, h, h, h];
+                default: return [h];
+            }
+        }
+        function harmonyLight(harmony, i) {
+            // Lightness plan per slot for hue-repeating harmonies
+            if (harmony === 'mono') return [30, 42, 55, 68, 80][i % 5];
+            if (harmony === 'shades') return [20, 35, 50, 65, 80][i % 5];
+            return null;
+        }
+
+        function generatePalette() {
+            const { h, s } = state.base;
+            const hues = harmonyHues(state.harmony, h);
+            const out = [];
+            for (let i = 0; i < N; i++) {
+                if (state.locks[i] && state.palette[i]) { out.push(state.palette[i]); continue; }
+                const hh = hues[i % hues.length];
+                let ll, ss = s;
+                const plan = harmonyLight(state.harmony, i);
+                if (plan !== null) { ll = plan; ss = state.harmony === 'shades' ? Math.max(25, s - 10) : s; }
+                else if (i >= hues.length) {
+                    // Extra slots: reuse hue with alternating lightness offset
+                    const k = Math.floor(i / hues.length);
+                    ll = clamp(62 + (k % 2 === 1 ? -14 * k : 12 * k), 10, 90);
+                } else { ll = 62; }
+                out.push({ h: Math.round(hh), s: Math.round(ss), l: Math.round(ll) });
+            }
+            state.palette = out;
+        }
+
+        function syncBaseInputs() {
+            const { r, g, b } = hslToRgb(state.base.h, state.base.s, state.base.l);
+            const hex = rgbToHex(r, g, b);
+            $('baseColor').value = hex;
+            $('baseHex').value = hex;
+        }
+
+        // === Render ===
+        const LOCK_SVG = '<svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+        function render() {
+            const wrap = $('palette');
+            wrap.innerHTML = state.palette.map((c, i) => {
+                const { r, g, b } = hslToRgb(c.h, c.s, c.l);
+                const hex = rgbToHex(r, g, b);
+                const dark = luminance({ r, g, b }) > 0.4;
+                return '<div class="swatch">' +
+                    '<div class="swatch-color" data-act="copy" data-i="' + i + '" style="background:' + hex + '" title="Click to copy ' + hex + '">' +
+                    '<button class="swatch-lock' + (state.locks[i] ? ' on' : '') + '" data-act="lock" data-i="' + i + '" title="' + (state.locks[i] ? 'Unlock' : 'Lock') + '" style="' + (dark ? 'border-color:rgba(0,0,0,.3);background:rgba(0,0,0,.25);' : '') + '">' + LOCK_SVG + '</button></div>' +
+                    '<div class="swatch-body"><div class="swatch-hex" data-act="copy" data-i="' + i + '">' + hex + '</div>' +
+                    '<div class="swatch-sub">rgb ' + r + ' ' + g + ' ' + b + '</div>' +
+                    '<div class="swatch-sub">hsl ' + c.h + ' ' + c.s + '% ' + c.l + '%</div></div></div>';
+            }).join('');
+            syncContrastSelects();
+            updateContrast();
+            updateExport();
+            saveState();
+        }
+
+        // === Persistence (localStorage - the FAQ promises it, so it exists) ===
+        function saveState() {
+            try { localStorage.setItem('dyemill_state', JSON.stringify({ base: state.base, harmony: state.harmony, locks: state.locks, palette: state.palette })); } catch (e) {}
+        }
+        function loadState() {
+            try {
+                const raw = localStorage.getItem('dyemill_state');
+                if (!raw) return false;
+                const s = JSON.parse(raw);
+                if (!s || !s.base || !Array.isArray(s.palette) || s.palette.length !== N || !Array.isArray(s.locks)) return false;
+                state.base = s.base;
+                state.locks = s.locks;
+                state.palette = s.palette;
+                if (s.harmony) { state.harmony = s.harmony; $('harmony').value = s.harmony; }
+                return true;
+            } catch (e) { return false; }
+        }
+
+        $('palette').addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-act]');
+            if (!btn) return;
+            const i = parseInt(btn.dataset.i);
+            if (btn.dataset.act === 'lock') {
+                state.locks[i] = !state.locks[i];
+                showToast(state.locks[i] ? 'Color locked' : 'Color unlocked', 'info');
+                render();
+            } else if (btn.dataset.act === 'copy') {
+                const c = state.palette[i];
+                const { r, g, b } = hslToRgb(c.h, c.s, c.l);
+                copyText(rgbToHex(r, g, b));
+                showToast('Copied ' + rgbToHex(r, g, b), 'success');
+                trackEvent('action-dye-copy');
+            }
+        });
+
+        function copyText(t) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(t).catch(() => fallbackCopy(t));
+            } else fallbackCopy(t);
+        }
+        function fallbackCopy(t) {
+            const ta = document.createElement('textarea');
+            ta.value = t;
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); } catch (e) {}
+            document.body.removeChild(ta);
+        }
+
+        // === Controls ===
+        function newRandomBase() {
+            state.base = randomBase();
+            syncBaseInputs();
+            generatePalette();
+            render();
+        }
+        $('diceBtn').addEventListener('click', () => { trackEvent('action-dye-dice'); newRandomBase(); });
+        $('baseColor').addEventListener('input', () => {
+            const rgb = hexToRgb($('baseColor').value);
+            if (!rgb) return;
+            state.base = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            $('baseHex').value = $('baseColor').value;
+            generatePalette();
+            render();
+        });
+        $('baseHex').addEventListener('change', () => {
+            const rgb = hexToRgb($('baseHex').value);
+            if (!rgb) { showToast('Invalid hex color', 'error'); syncBaseInputs(); return; }
+            state.base = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            generatePalette();
+            render();
+        });
+        $('harmony').addEventListener('change', () => {
+            state.harmony = $('harmony').value;
+            trackEvent('harmony-' + state.harmony);
+            generatePalette();
+            render();
+        });
+
+        // Spacebar = re-roll unlocked (never while typing)
+        let lastSpaceTrack = 0;
+        document.addEventListener('keydown', (e) => {
+            if (e.code !== 'Space') return;
+            const tag = (document.activeElement && document.activeElement.tagName) || '';
+            if (/INPUT|TEXTAREA|SELECT/.test(tag)) return;
+            if ($('aboutDialog').open) return;
+            e.preventDefault();
+            newRandomBase();
+            const now = Date.now();
+            if (now - lastSpaceTrack > 10000) { lastSpaceTrack = now; trackEvent('action-dye-spacebar'); }
+        });
+
+        // === Image extraction (bucket quantization, in-browser) ===
+        $('extractBtn').addEventListener('click', () => $('extractInput').click());
+        $('extractInput').addEventListener('change', () => {
+            const f = $('extractInput').files[0];
+            $('extractInput').value = '';
+            if (!f) return;
+            const url = URL.createObjectURL(f);
+            const img = new Image();
+            img.onload = () => {
+                try {
+                    const S = 120;
+                    const scale = Math.min(1, S / Math.max(img.width, img.height));
+                    const w = Math.max(1, Math.round(img.width * scale));
+                    const h = Math.max(1, Math.round(img.height * scale));
+                    const c = document.createElement('canvas');
+                    c.width = w; c.height = h;
+                    const ctx = c.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    const data = ctx.getImageData(0, 0, w, h).data;
+                    const buckets = new Map();
+                    for (let i = 0; i < data.length; i += 4) {
+                        const r = data[i], g = data[i + 1], b = data[i + 2];
+                        const key = ((r >> 4) << 8) | ((g >> 4) << 4) | (b >> 4);
+                        const e = buckets.get(key) || { n: 0, r: 0, g: 0, b: 0 };
+                        e.n++; e.r += r; e.g += g; e.b += b;
+                        buckets.set(key, e);
+                    }
+                    const sorted = [...buckets.values()].sort((a, b) => b.n - a.n);
+                    const picked = [];
+                    for (const e of sorted) {
+                        const rgb = { r: Math.round(e.r / e.n), g: Math.round(e.g / e.n), b: Math.round(e.b / e.n) };
+                        if (picked.every(p => Math.abs(p.r - rgb.r) + Math.abs(p.g - rgb.g) + Math.abs(p.b - rgb.b) > 90)) picked.push(rgb);
+                        if (picked.length >= N) break;
+                    }
+                    if (!picked.length) { showToast('Could not read that image', 'error'); return; }
+                    while (picked.length < N) picked.push(picked[picked.length - 1]);
+                    state.palette = picked.map(p => rgbToHsl(p.r, p.g, p.b));
+                    state.locks = [false, false, false, false, false];
+                    const first = state.palette[0];
+                    state.base = { h: first.h, s: first.s, l: first.l };
+                    syncBaseInputs();
+                    trackEvent('action-dye-extract');
+                    showToast('Palette extracted from image', 'success');
+                    render();
+                } catch (err) {
+                    showToast('Could not read that image', 'error');
+                }
+                URL.revokeObjectURL(url);
+            };
+            img.onerror = () => { URL.revokeObjectURL(url); showToast('Could not read that image', 'error'); };
+            img.src = url;
+        });
+
+        // === Export ===
+        function paletteHexes() {
+            return state.palette.map(c => {
+                const { r, g, b } = hslToRgb(c.h, c.s, c.l);
+                return { hex: rgbToHex(r, g, b), r, g, b, c };
+            });
+        }
+        function buildExport() {
+            const cols = paletteHexes();
+            const fmt = $('expFormat').value;
+            if (fmt === 'css') {
+                return ':root {\n' + cols.map((c, i) => '  --dye-' + (i + 1) + ': ' + c.hex + ';').join('\n') + '\n}';
+            }
+            if (fmt === 'tailwind') {
+                return 'colors: {\n  dye: {\n' + cols.map((c, i) => "    '" + (i + 1) + "': '" + c.hex + "',").join('\n') + '\n  },\n}';
+            }
+            if (fmt === 'rgb') {
+                return cols.map(c => 'rgb(' + c.r + ', ' + c.g + ', ' + c.b + ')').join('\n');
+            }
+            return cols.map(c => c.hex).join('\n');
+        }
+        function updateExport() {
+            if (!state.palette.length) return;
+            $('exportOut').textContent = buildExport();
+        }
+        $('expFormat').addEventListener('change', () => { updateExport(); trackEvent('export-' + $('expFormat').value); });
+        $('copyExpBtn').addEventListener('click', () => {
+            copyText(buildExport());
+            trackEvent('action-dye-export-copy');
+            showToast('Export copied (' + $('expFormat').value + ')', 'success');
+        });
+        function downloadBlob(blob, name) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = name;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+        }
+        $('dlPngBtn').addEventListener('click', () => {
+            const cols = paletteHexes();
+            const c = document.createElement('canvas');
+            c.width = cols.length * 200; c.height = 200;
+            const ctx = c.getContext('2d');
+            cols.forEach((col, i) => { ctx.fillStyle = col.hex; ctx.fillRect(i * 200, 0, 200, 200); });
+            c.toBlob((blob) => {
+                if (!blob) { showToast('PNG export failed', 'error'); return; }
+                downloadBlob(blob, 'dyemill-palette.png');
+                trackEvent('action-dye-png');
+                showToast('PNG strip downloaded', 'success');
+            }, 'image/png');
+        });
+        $('dlSvgBtn').addEventListener('click', () => {
+            const cols = paletteHexes();
+            const rects = cols.map((c, i) => '<rect x="' + (i * 100) + '" y="0" width="100" height="100" fill="' + c.hex + '"/>').join('');
+            const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (cols.length * 100) + ' 100">' + rects + '</svg>';
+            downloadBlob(new Blob([svg], { type: 'image/svg+xml' }), 'dyemill-palette.svg');
+            trackEvent('action-dye-svg');
+            showToast('SVG downloaded', 'success');
+        });
+
+        // === Contrast checker ===
+        function syncContrastSelects() {
+            const cols = paletteHexes();
+            const opts = cols.map((c, i) => '<option value="' + i + '">Color ' + (i + 1) + ' (' + c.hex + ')</option>').join('');
+            const a = $('contrastA'), b = $('contrastB');
+            const av = a.value, bv = b.value;
+            a.innerHTML = opts; b.innerHTML = opts;
+            a.value = av !== '' ? av : '0';
+            b.value = bv !== '' ? bv : '1';
+            if (a.value === b.value) b.value = b.value === '0' ? '1' : '0';
+        }
+        function updateContrast() {
+            if (!state.palette.length) return;
+            const cols = paletteHexes();
+            const ai = clamp(parseInt($('contrastA').value) || 0, 0, cols.length - 1);
+            let bi = clamp(parseInt($('contrastB').value) || 0, 0, cols.length - 1);
+            if (bi === ai) bi = (ai + 1) % cols.length;
+            const A = cols[ai], B = cols[bi];
+            const ratio = contrastRatio(A, B);
+            const aa = ratio >= 4.5, aaLarge = ratio >= 3, aaa = ratio >= 7;
+            const mark = ok => ok ? '<span class="pass">PASS</span>' : '<span class="fail">FAIL</span>';
+            $('contrastOut').innerHTML =
+                'Ratio <strong>' + ratio.toFixed(2) + ':1</strong> (' + A.hex + ' on ' + B.hex + ')<br>' +
+                'AA normal text ' + mark(aa) + ' &nbsp; AA large text ' + mark(aaLarge) + ' &nbsp; AAA ' + mark(aaa);
+            const demo = $('contrastDemo');
+            demo.style.color = A.hex;
+            demo.style.background = B.hex;
+        }
+        $('contrastA').addEventListener('change', () => { updateContrast(); trackEvent('action-dye-contrast'); });
+        $('contrastB').addEventListener('change', updateContrast);
+
+        // === About dialog ===
+        $('aboutBtn').addEventListener('click', () => $('aboutDialog').showModal());
+        $('aboutClose').addEventListener('click', () => $('aboutDialog').close());
+        $('aboutDialog').addEventListener('click', (e) => {
+            if (e.target === $('aboutDialog')) $('aboutDialog').close();
+        });
+
+        // === Init ===
+        if (!loadState()) generatePalette();
+        else syncBaseInputs();
+        render();
+        if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+    </script>
+</body>
+</html>
